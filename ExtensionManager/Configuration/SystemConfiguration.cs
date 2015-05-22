@@ -10,7 +10,7 @@ namespace TridionCommunity.Extensions
 {
     internal class SystemConfiguration
     {
-        protected XNamespace c = "http://www.sdltridion.com/2009/GUI/Configuration";
+        protected XNamespace c = @"http://www.sdltridion.com/2009/GUI/Configuration";
         protected string filePath;
         protected XDocument configuration;
         protected bool loaded;

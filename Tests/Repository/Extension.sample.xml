@@ -1,0 +1,23 @@
+<Extension>
+	<Name>Extension Name</Name>
+	<Description><![CDATA[This is the description.</br>It can <i>even</i> contain <strong>HTML</strong> markup!]]></Description>
+	<Author>Peter Kjaer (SDL)</Author>
+	<Icon>Icon.png</Icon>
+	<Header>Cool Tools</Header>
+	<Editor>
+		<Name>Test.Editor</Name>
+		<Path>Editor</Path>
+		<Configuration>Configuration\Editor.config</Configuration>
+		<VirtualDirectory>Test</VirtualDirectory>
+	</Editor>
+	<Model>
+		<Name>Test.Model</Name>
+		<Path>Model</Path>
+		<Configuration>Configuration\Model.config</Configuration>
+		<VirtualDirectory>Test</VirtualDirectory>
+	</Model>
+	<WebsiteAssemblies>
+		<Assembly>Editor\bin\Test.Editor.dll</Assembly>
+		<Assembly>Model\bin\Test.Model.dll</Assembly>
+	</WebsiteAssemblies>
+</Extension>
