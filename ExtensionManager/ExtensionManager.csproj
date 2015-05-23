@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ExtensionConfiguration.cs" />
     <Compile Include="ExtensionInfo.cs" />
     <Compile Include="Configuration\SystemConfiguration.cs" />

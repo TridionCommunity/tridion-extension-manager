@@ -8,18 +8,31 @@ using TridionCommunity.Extensions.Properties;
 
 namespace TridionCommunity.Extensions
 {
+    /// <summary>
+    /// Contains all of the information available about an extension as well as the operations you can do on it (install, uninstall, disable, etc.)
+    /// </summary>
     internal class Extension
     {
+        /// <summary>The metadata information about the extension. See <see cref="ExtensionInfo"/> for details.</summary>
         public ExtensionInfo Info { get; set; }
+        /// <summary>The configuration of the extension's editor.</summary>
         public SystemConfigSection Editor { get; set; }
+        /// <summary>The configuration of the extension's model.</summary>
         public SystemConfigSection Model { get; set; }
+        /// <summary>The list of assemblies to install into the <code>bin</code> folder of the CME website.</summary>
         public List<string> WebsiteAssemblies { get; set; }
 
+        /// <summary>The name of the extension ZIP file within the repository.</summary>
         public string RepositoryFileName { get; set; }
+        /// <summary>The directory that the extension should be installed in.</summary>
         public string InstallPath { get; set; }
+        /// <summary>The path to the System.config file from the CME.</summary>
         public string SystemConfigFile { get; set; }
 
 
+        /// <summary>
+        /// Installs the extension in a disabled state.
+        /// </summary>
         internal void Install()
         {
             AssertInitialized();
@@ -57,6 +70,9 @@ namespace TridionCommunity.Extensions
             }
         }
 
+        /// <summary>
+        /// Disables and uninstalls the extension.
+        /// </summary>
         internal void Uninstall()
         {
             AssertInitialized();
@@ -96,6 +112,10 @@ namespace TridionCommunity.Extensions
             Info.Status = InstallState.Uninstalled;
         }
 
+        /// <summary>
+        /// Enables the extension for immediate use.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException">If the extension has not been installed.</exception>
         internal void Enable()
         {
             AssertInitialized();
@@ -113,6 +133,9 @@ namespace TridionCommunity.Extensions
             Info.Enabled = true;
         }
 
+        /// <summary>
+        /// Disables the extension. Takes effect immediately.
+        /// </summary>
         internal void Disable()
         {
             AssertInitialized();
@@ -125,6 +148,9 @@ namespace TridionCommunity.Extensions
             Info.Enabled = false;
         }
 
+        /// <summary>
+        /// Refreshes the Status and Enabled properties based on the current state of the system.
+        /// </summary>
         internal void RefreshStatus()
         {
             Info.Status = InstallState.Uninstalled;
@@ -142,6 +168,9 @@ namespace TridionCommunity.Extensions
             }
         }
 
+        /// <summary>
+        /// Validates that the properties required for the other methods have been set.
+        /// </summary>
         private void AssertInitialized()
         {
             if (string.IsNullOrWhiteSpace(RepositoryFileName))

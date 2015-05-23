@@ -5,19 +5,32 @@ using System.IO;
 using System.Xml.Linq;
 using System.Linq;
 using TridionCommunity.Extensions.Properties;
+using TridionCommunity.Extensions.Configuration;
+using System.Xml;
 
 namespace TridionCommunity.Extensions
 {
+    /// <summary>
+    /// Represents the metadata configuration for an extension and allows creating new instances based on it.
+    /// </summary>
     internal class ExtensionConfiguration
     {
         protected string filePath;
         protected XDocument configuration;
         
+        /// <summary>
+        /// Loads the extension configuration from the ZIP file in the repository.
+        /// </summary>
+        /// <param name="zipFile">The name of the file to load.</param>
+        /// <returns>An <see cref="ExtensionConfiguration"/> instance based on the configuration file.</returns>
         public static ExtensionConfiguration Load(string zipFile)
         {
             return new ExtensionConfiguration(zipFile);
         }
 
+        /// <summary>
+        /// Returns the full XML document containing the extension metadata.
+        /// </summary>
         public XDocument Xml
         {
             get
@@ -26,6 +39,10 @@ namespace TridionCommunity.Extensions
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of an <see cref="Extension"/> based on the configuration.
+        /// </summary>
+        /// <returns>The new <see cref="Extension"/> with values initialized from its configuration.</returns>
         internal Extension CreateInstance()
         {
             if (configuration == null)
@@ -53,7 +70,11 @@ namespace TridionCommunity.Extensions
             };
         }
 
-
+        /// <summary>
+        /// Creates a new <see cref="ExtensionConfiguration"/> by reading the supplied ZIP file.
+        /// </summary>
+        /// <param name="zipFile">The path to the extension ZIP file in the repository.</param>
+        /// <exception cref="ConfigurationException">If the ZIP file does not contain a valid <code>Extension.xml</code> file.</exception>
         protected ExtensionConfiguration(string zipFile)
         {
             this.filePath = zipFile;
@@ -61,12 +82,26 @@ namespace TridionCommunity.Extensions
             string extensionXml = ReadEntryFromZip(zipFile, @"Extension.xml");
             if (string.IsNullOrEmpty(extensionXml))
             {
-                throw new Exception(Resources.ErrInvalidExtensionXml);
+                throw new ConfigurationException(Resources.ErrInvalidExtensionXml);
             }
 
-            configuration = XDocument.Parse(extensionXml);
+            try
+            {
+                configuration = XDocument.Parse(extensionXml);
+            }
+            catch (XmlException ex)
+            {
+                throw new ConfigurationException(Resources.ErrInvalidExtensionXml, ex);
+            }
         }
 
+        /// <summary>
+        /// Reads a specified file located inside of a ZIP archive.
+        /// </summary>
+        /// <param name="zipFile">The path to the ZIP archive containing the file.</param>
+        /// <param name="entryName">The name of the file to read.</param>
+        /// <returns>The entire content of the specified file.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         protected string ReadEntryFromZip(string zipFile, string entryName)
         {
             try
@@ -102,6 +137,11 @@ namespace TridionCommunity.Extensions
             return null;
         }
 
+        /// <summary>
+        /// Reads the string content of an XElement. Has silent error handling.
+        /// </summary>
+        /// <param name="element">The element whose text content you wish to read.</param>
+        /// <returns>The text content of the element, if it exists. Returns null otherwise.</returns>
         private static string GetString(XElement element)
         {
             if (element != null)
@@ -112,6 +152,11 @@ namespace TridionCommunity.Extensions
             return null;
         }
 
+        /// <summary>
+        /// Reads the Version content of an XElement. Has silent error handling.
+        /// </summary>
+        /// <param name="element">The element whose content you wish to read.</param>
+        /// <returns>The Version parsed from the text content of the element, if it exists and can be parsed as a Version. Returns null otherwise.</returns>
         private static Version GetVersion(XElement element)
         {
             if (element != null)
@@ -126,6 +171,11 @@ namespace TridionCommunity.Extensions
             return new Version(0, 0);
         }
 
+        /// <summary>
+        /// Parses a full Editor or Model section from the extension configuration. Has silent error handling.
+        /// </summary>
+        /// <param name="element">The parent element (Editor or Model)</param>
+        /// <returns>The section if it could be parsed. Null otherwise.</returns>
         private static SystemConfigSection GetConfigurationInfo(XElement element)
         {
             if (element != null)
@@ -141,6 +191,11 @@ namespace TridionCommunity.Extensions
             return null;
         }
 
+        /// <summary>
+        /// Parses a list of Assembly elements from the configuration.
+        /// </summary>
+        /// <param name="container">The parent element (i.e. WebsiteAssemblies)</param>
+        /// <returns>A list of strings containing the assembly paths.</returns>
         private static List<string> GetAssemblyList(XElement container)
         {
             var result = new List<string>();
