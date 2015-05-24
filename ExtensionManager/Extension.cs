@@ -1,9 +1,10 @@
-﻿using Ionic.Zip;
+﻿using System.Linq;
+using Ionic.Zip;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Xml.Linq;
+using TridionCommunity.Extensions.Configuration;
 using TridionCommunity.Extensions.Properties;
 
 namespace TridionCommunity.Extensions
@@ -21,6 +22,8 @@ namespace TridionCommunity.Extensions
         public SystemConfigSection Model { get; set; }
         /// <summary>The list of assemblies to install into the <code>bin</code> folder of the CME website.</summary>
         public List<string> WebsiteAssemblies { get; set; }
+        /// <summary>The information required to be added to the SDL manifest file (if applicable).</summary>
+        public SdlManifestEntry ManifestEntry { get; set; }
 
         /// <summary>The name of the extension ZIP file within the repository.</summary>
         public string RepositoryFileName { get; set; }
@@ -28,6 +31,8 @@ namespace TridionCommunity.Extensions
         public string InstallPath { get; set; }
         /// <summary>The path to the System.config file from the CME.</summary>
         public string SystemConfigFile { get; set; }
+        /// <summary>The path to the SDL manifest file from the CME.</summary>
+        public string SdlManifestFilePath { get; set; }
 
 
         /// <summary>
@@ -53,17 +58,15 @@ namespace TridionCommunity.Extensions
 
                 if (WebsiteAssemblies.Count > 0)
                 {
-                    var assemblies = new List<FileInfo>();
-                    foreach (string filePath in WebsiteAssemblies)
-                    {
-                        string sourcePath = Path.Combine(InstallPath, filePath);
-                        if (File.Exists(sourcePath))
-                        {
-                            assemblies.Add(new FileInfo(sourcePath));
-                        }
-                    }
-
+                    var assemblies = WebsiteAssemblies.Select(filePath => Path.Combine(InstallPath, filePath)).Select(sourcePath => new FileInfo(sourcePath)).ToList();
                     Website.AddAssembliesToBin(assemblies);
+                }
+
+                if (ManifestEntry != null)
+                {
+                    var manifest = SdlManifest.Load(SdlManifestFilePath);
+                    manifest.AddEntry(ManifestEntry);
+                    manifest.Save();
                 }
 
                 Info.Status = InstallState.Installed;
@@ -99,15 +102,16 @@ namespace TridionCommunity.Extensions
 
             if (WebsiteAssemblies.Count > 0)
             {
-                var assemblyNames = new List<string>();
-                foreach (string filePath in WebsiteAssemblies)
-                {
-                    assemblyNames.Add(Path.GetFileName(filePath));
-                }
-
+                var assemblyNames = WebsiteAssemblies.Select(Path.GetFileName).ToList();
                 Website.RemoveAssembliesFromBin(assemblyNames);
             }
 
+            if (ManifestEntry != null)
+            {
+                var manifest = SdlManifest.Load(SdlManifestFilePath);
+                manifest.RemoveEntry(ManifestEntry);
+                manifest.Save();
+            }
 
             Info.Status = InstallState.Uninstalled;
         }

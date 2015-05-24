@@ -135,6 +135,9 @@
   <data name="ErrInvalidExtensionXml" xml:space="preserve">
     <value>Extension.xml is invalid.</value>
   </data>
+  <data name="ErrInvalidSdlManifestFile" xml:space="preserve">
+    <value>The SDL manifest file is invalid or does not contain the expected elements.</value>
+  </data>
   <data name="ErrMissingSectionInSystemConfig" xml:space="preserve">
     <value>Missing required section in the System.config file: {0}</value>
   </data>

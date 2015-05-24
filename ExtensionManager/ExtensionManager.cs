@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using TridionCommunity.Extensions.Configuration;
 using TridionCommunity.Extensions.Properties;
 
 namespace TridionCommunity.Extensions
@@ -18,6 +19,8 @@ namespace TridionCommunity.Extensions
         public string ExtensionsDirectory { get; protected set; }
         /// <summary>The path to the System.config file of the Content Manager Explorer.</summary>
         public string SystemConfigFile { get; protected set; }
+        /// <summary>The path to the manifest.xml file which manages the entries in the slide-out navigation menu. </summary>
+        public string SdlManifestFile { get; protected set; }
 
 
         private List<Extension> extensions = new List<Extension>();
@@ -30,7 +33,7 @@ namespace TridionCommunity.Extensions
         /// <param name="extensionsDirectory">The directory where the extensions should be installed.</param>
         /// <param name="systemConfigPath">The path to the System.config configuration file of the Content Manager Explorer.</param>
         /// <exception cref="System.ArgumentException">If any of the directories or files specified in the arguments do not exist.</exception>
-        public ExtensionManager(string repositoryLocation, string extensionsDirectory, string systemConfigPath)
+        public ExtensionManager(string repositoryLocation, string extensionsDirectory, string systemConfigPath, string sdlManifestFile)
         {
             if (!Directory.Exists(repositoryLocation))
             {
@@ -47,9 +50,15 @@ namespace TridionCommunity.Extensions
                 throw new ArgumentException(Resources.ErrFileDoesNotExist, @"systemConfigPath");
             }
 
+            if (!File.Exists(sdlManifestFile))
+            {
+                throw new ArgumentException(Resources.ErrFileDoesNotExist, @"sdlManifestFile");
+            }
+
             RepositoryLocation = repositoryLocation;
             ExtensionsDirectory = extensionsDirectory;
             SystemConfigFile = systemConfigPath;
+            SdlManifestFile = sdlManifestFile;
         }
 
         /// <summary>
@@ -158,6 +167,7 @@ namespace TridionCommunity.Extensions
                 result.InstallPath = Path.Combine(ExtensionsDirectory, result.Info.Name);
                 result.RepositoryFileName = zipFile;
                 result.SystemConfigFile = SystemConfigFile;
+                result.SdlManifestFilePath = SdlManifestFile;
                 result.RefreshStatus();
                 return result;
             }

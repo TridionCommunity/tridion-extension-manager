@@ -1,5 +1,5 @@
 ﻿
-namespace TridionCommunity.Extensions
+namespace TridionCommunity.Extensions.Configuration
 {
     /// <summary>
     /// Contains the information needed to set up an editor or model in the CME.

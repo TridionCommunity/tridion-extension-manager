@@ -54,7 +54,7 @@ namespace TridionCommunity.Extensions
             var other = obj as ExtensionInfo;
             if (other != null)
             {
-                return Header.CompareTo(other.Header);
+                return String.Compare(Header, other.Header, StringComparison.InvariantCulture);
             }
             return -1;
         }

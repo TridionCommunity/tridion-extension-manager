@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"	?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../SDL.Client/SDL.Client.Core/configuration.xsd" merge="false">
+	<applicationSuite id="wcm" authenticationUrl="/WebUI/Editors/Base/Views/Authentication/Authentication.aspx" authenticationMode="on-access">
+		<applicationDomains>
+			<applicationDomain id="local" domain=""/>
+		</applicationDomains>
+		<applicationEntryPointGroups>
+			<applicationEntryPointGroup id="wcm.cm" title="Web Content Management">
+				<translations>
+					<title lang="de">Web Content Management</title>
+					<title lang="es">Gestión de contenido Web</title>
+					<title lang="fr">Gestion de contenu Web</title>
+					<title lang="ja">Web コンテンツ管理</title>
+					<title lang="nl">Web Content Management</title>
+				</translations>
+				<applicationEntryPoints>
+					<applicationEntryPoint id="home" type="home" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/../CME/Views/Welcome/Welcome.aspx" />
+					<applicationEntryPoint id="activities" type="activities" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/../CME/Views/WorkflowActivities/WorkflowActivities.aspx" />
+					<applicationEntryPoint id="sites" title="Sites" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/../CME/Views/Sites/Sites.aspx" icon="/WebUI/Editors/CME/Themes/SDL/Images/Icons/sites.16.mono-bright.png">
+						<translations>
+							<title lang="de">Webseiten</title>
+							<title lang="es">Sitios</title>
+							<title lang="fr">Sites</title>
+							<title lang="ja">サイト</title>
+							<title lang="nl">Sites</title>
+						</translations>
+						</applicationEntryPoint>
+						<applicationEntryPoint id="editing-site" title="Editing Site" domainId="local" url="/WebUI/Editors/SiteEdit/Views/Editor.aspx" contextual="true" icon="/WebUI/Editors/CME/Themes/SDL/Images/Icons/edit.16.mono-bright.png">
+						<translations>
+							<title lang="de">Webseite zur Bearbeitung</title>
+							<title lang="es">Sitio de edición</title>
+							<title lang="fr">Modification d'un site</title>
+							<title lang="ja">サイトの編集</title>
+							<title lang="nl">Site bewerken</title>
+						</translations>
+					</applicationEntryPoint>
+					<applicationEntryPoint id="cme" title="Content Explorer" domainId="local" url="/WebUI/Editors/CME/Views/Dashboard/Dashboard.aspx" icon="/WebUI/Editors/CME/Themes/SDL/Images/Icons/web.content-explorer.16.mono-bright.png">
+						<translations>
+							<title lang="de">Content Explorer</title>
+							<title lang="es">Explorador de contenido</title>
+							<title lang="fr">Explorateur de contenu</title>
+							<title lang="ja">コンテンツ エクスプローラ</title>
+							<title lang="nl">Content Explorer</title>
+						</translations>
+					</applicationEntryPoint>
+					<!-- Start of the applicationEntryPoint collection for extensions -->
+					
+					<!-- End of the applicationEntryPoint collection for extensions -->
+					<applicationEntryPoint id="settings" type="settings" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/Views/Settings/Settings.aspx" />
+					<applicationEntryPoint id="help" type="help" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/../CME/Views/Help/Help.aspx" />
+					<applicationEntryPoint id="about" type="about" domainId="local" url="/WebUI/Editors/Base/Views/ProxyView/ProxyView.aspx?pagePath=~/Views/About/About.aspx" />
+				</applicationEntryPoints>
+			</applicationEntryPointGroup>
+		</applicationEntryPointGroups>
+	</applicationSuite>
+</configuration>

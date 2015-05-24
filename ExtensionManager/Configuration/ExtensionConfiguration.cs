@@ -1,14 +1,13 @@
-﻿using Ionic.Zip;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
 using System.Linq;
-using TridionCommunity.Extensions.Properties;
-using TridionCommunity.Extensions.Configuration;
 using System.Xml;
+using System.Xml.Linq;
+using Ionic.Zip;
+using TridionCommunity.Extensions.Properties;
 
-namespace TridionCommunity.Extensions
+namespace TridionCommunity.Extensions.Configuration
 {
     /// <summary>
     /// Represents the metadata configuration for an extension and allows creating new instances based on it.
@@ -66,7 +65,8 @@ namespace TridionCommunity.Extensions
                 },
                 Editor = GetConfigurationInfo(root.Element(@"Editor")),
                 Model = GetConfigurationInfo(root.Element(@"Model")),
-                WebsiteAssemblies = GetAssemblyList(root.Element(@"WebsiteAssemblies"))
+                WebsiteAssemblies = GetAssemblyList(root.Element(@"WebsiteAssemblies")),
+                ManifestEntry = GetSdlManifestEntry(root.Element(@"SdlManifest"))
             };
         }
 
@@ -77,7 +77,7 @@ namespace TridionCommunity.Extensions
         /// <exception cref="ConfigurationException">If the ZIP file does not contain a valid <code>Extension.xml</code> file.</exception>
         protected ExtensionConfiguration(string zipFile)
         {
-            this.filePath = zipFile;
+            filePath = zipFile;
 
             string extensionXml = ReadEntryFromZip(zipFile, @"Extension.xml");
             if (string.IsNullOrEmpty(extensionXml))
@@ -104,37 +104,29 @@ namespace TridionCommunity.Extensions
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         protected string ReadEntryFromZip(string zipFile, string entryName)
         {
-            try
+            using (var ms = new MemoryStream())
             {
-                using (var ms = new MemoryStream())
+                using (ZipFile file = ZipFile.Read(zipFile))
                 {
-                    using (ZipFile file = ZipFile.Read(zipFile))
+                    var entry = file[entryName];
+                    using (var stream = entry.OpenReader())
                     {
-                        var manifest = file[entryName];
-                        using (var stream = manifest.OpenReader())
+                        var buffer = new byte[2048];
+                        int n;
+                        while ((n = stream.Read(buffer, 0, buffer.Length)) > 0)
                         {
-                            var buffer = new byte[2048];
-                            int n;
-                            while ((n = stream.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                ms.Write(buffer, 0, n);
-                            }
+                            ms.Write(buffer, 0, n);
                         }
                     }
+                }
 
-                    ms.Seek(0, SeekOrigin.Begin);
+                ms.Seek(0, SeekOrigin.Begin);
 
-                    using (var reader = new StreamReader(ms))
-                    {
-                        return reader.ReadToEnd();
-                    }
+                using (var reader = new StreamReader(ms))
+                {
+                    return reader.ReadToEnd();
                 }
             }
-            catch
-            {
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -196,7 +188,7 @@ namespace TridionCommunity.Extensions
         /// </summary>
         /// <param name="container">The parent element (i.e. WebsiteAssemblies)</param>
         /// <returns>A list of strings containing the assembly paths.</returns>
-        private static List<string> GetAssemblyList(XElement container)
+        private static List<string> GetAssemblyList(XContainer container)
         {
             var result = new List<string>();
             if (container == null)
@@ -205,11 +197,39 @@ namespace TridionCommunity.Extensions
             }
 
             var elements = container.Elements(@"Assembly");
-            if (elements != null)
-            {
-                result.AddRange(elements.Select(e => e.Value));
-            }
+            result.AddRange(elements.Select(e => e.Value));
             return result;
+        }
+
+        /// <summary>
+        /// Parses an entry for the SDL manifest file from the extension configuration.
+        /// </summary>
+        /// <param name="container">The parent element of the entry.</param>
+        /// <returns>A new instance of the <see cref="SdlManifestEntry"/> class.</returns>
+        private static SdlManifestEntry GetSdlManifestEntry(XContainer container)
+        {
+            if (container != null)
+            {
+                var result = new SdlManifestEntry
+                {
+                    Id = GetString(container.Element("Id")),
+                    Title = GetString(container.Element("Title")),
+                    Icon = GetString(container.Element("Icon")),
+                    Url = GetString(container.Element("Url"))
+                };
+
+                var translations = container.Element("Translations");
+                if (translations != null)
+                {
+                    foreach (var t in translations.Elements())
+                    {
+                        result.Translations.Add((string) t.Attribute("language"), t.Value);
+                    }
+                }
+
+            }
+
+            return null;
         }
     }
 }

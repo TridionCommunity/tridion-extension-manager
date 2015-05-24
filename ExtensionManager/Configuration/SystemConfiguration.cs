@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using TridionCommunity.Extensions.Configuration;
 using TridionCommunity.Extensions.Properties;
 
-namespace TridionCommunity.Extensions
+namespace TridionCommunity.Extensions.Configuration
 {
     /// <summary>
     /// Represents the System.config file used by the Tridion Content Manager Explorer.
@@ -17,17 +17,15 @@ namespace TridionCommunity.Extensions
         protected XNamespace c = @"http://www.sdltridion.com/2009/GUI/Configuration";
         protected string filePath;
         protected XDocument configuration;
-        protected bool loaded;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="SystemConfigration"/>.
+        /// Creates a new instance of the <see cref="SystemConfiguration"/> class.
         /// </summary>
         /// <param name="filePath"></param>
         protected SystemConfiguration(string filePath)
         {
             this.filePath = filePath;
             configuration = XDocument.Load(filePath);
-            loaded = true;
         }
 
         /// <summary>
@@ -45,7 +43,6 @@ namespace TridionCommunity.Extensions
         /// </summary>
         public void Save()
         {
-            if (!loaded) return;
             ClearBrowserCache();
             configuration.Save(filePath);
         }
@@ -54,15 +51,9 @@ namespace TridionCommunity.Extensions
         /// Checks if the configuration contains an entry for a given editor.
         /// </summary>
         /// <param name="editor">The editor to check for.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         /// <returns>true if the editor is present in the configuration; false otherwise.</returns>
         public bool HasEditor(SystemConfigSection editor)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             if (editor == null)
             {
                 return false;
@@ -75,15 +66,9 @@ namespace TridionCommunity.Extensions
         /// Checks if the configuration contains an entry for a given model.
         /// </summary>
         /// <param name="model">The model to check for.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         /// <returns>true if the model is present in the configuration; false otherwise.</returns>
         public bool HasModel(SystemConfigSection model)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             if (model == null)
             {
                 return false;
@@ -97,14 +82,8 @@ namespace TridionCommunity.Extensions
         /// </summary>
         /// <param name="editor">The editor to add.</param>
         /// <param name="installationDirectory">The installation directory of the extension. Used to create the absolute installation path for the editor.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         public void AddEditor(SystemConfigSection editor, string installationDirectory)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             AddConfigurationInfo(GetEditorRootNode(), @"editor", editor, installationDirectory);
         }
 
@@ -113,14 +92,8 @@ namespace TridionCommunity.Extensions
         /// </summary>
         /// <param name="model">The model to add.</param>
         /// <param name="installationDirectory">The installation directory of the extension. Used to create the absolute installation path for the model.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         public void AddModel(SystemConfigSection model, string installationDirectory)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             AddConfigurationInfo(GetModelRootNode(), @"model", model, installationDirectory);
         }
 
@@ -128,14 +101,8 @@ namespace TridionCommunity.Extensions
         /// Removes the given editor from the configuration.
         /// </summary>
         /// <param name="editor">The editor to remove.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         public void RemoveEditor(SystemConfigSection editor)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             RemoveExistingNodes(GetEditorRootNode(), @"editor", editor.Name);
         }
 
@@ -143,14 +110,8 @@ namespace TridionCommunity.Extensions
         /// Removes the given model from the configuration.
         /// </summary>
         /// <param name="model">The model to remove.</param>
-        /// <exception cref="System.InvalidOperationException">If the configuration has not yet been loaded.</exception>
         public void RemoveModel(SystemConfigSection model)
         {
-            if (!loaded)
-            {
-                throw new InvalidOperationException(Resources.ErrConfigurationNotLoaded);
-            }
-
             RemoveExistingNodes(GetModelRootNode(), @"model", model.Name);
         }
 
@@ -179,6 +140,8 @@ namespace TridionCommunity.Extensions
         /// <exception cref="ConfigurationException">If the required <code>editors</code> node was not found in the configuration.</exception>
         protected XElement GetEditorRootNode()
         {
+            Debug.Assert(configuration.Root != null, "configuration.Root != null");
+
             var result = configuration.Root.Element(c + @"editors");
             if (result == null)
             {
@@ -194,6 +157,8 @@ namespace TridionCommunity.Extensions
         /// <exception cref="ConfigurationException">If the required <code>models</code> node was not found in the configuration.</exception>
         protected XElement GetModelRootNode()
         {
+            Debug.Assert(configuration.Root != null, "configuration.Root != null");
+
             var result = configuration.Root.Element(c + @"models");
             if (result == null)
             {

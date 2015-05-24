@@ -13,6 +13,7 @@ namespace Tests
         protected string repository = @"Repository";
         protected string installationDirectory = @"Extensions";
         protected string systemConfig = @"Configuration\System.config";
+        protected string manifest = @"Configuration\manifest.xml";
 
         protected XNamespace c = "http://www.sdltridion.com/2009/GUI/Configuration";
 
@@ -35,7 +36,7 @@ namespace Tests
         [TestMethod]
         public void TestExtensionList()
         {
-            var manager = new ExtensionManager(repository, installationDirectory, systemConfig);
+            var manager = new ExtensionManager(repository, installationDirectory, systemConfig, manifest);
             var extensions = manager.GetExtensions();
             Assert.AreEqual(numberOfExtensions, extensions.Count);
 
@@ -53,7 +54,7 @@ namespace Tests
         [TestMethod]
         public void TestInstallation()
         {
-            var manager = new ExtensionManager(repository, installationDirectory, systemConfig);
+            var manager = new ExtensionManager(repository, installationDirectory, systemConfig, manifest);
             var extensions = manager.GetExtensions();
             Assert.AreEqual(numberOfExtensions, extensions.Count);
 
@@ -77,7 +78,7 @@ namespace Tests
         [TestMethod]
         public void TestEnableDisable()
         {
-            var manager = new ExtensionManager(repository, installationDirectory, systemConfig);
+            var manager = new ExtensionManager(repository, installationDirectory, systemConfig, manifest);
             var extensions = manager.GetExtensions();
             Assert.AreEqual(numberOfExtensions, extensions.Count);
 
@@ -132,7 +133,7 @@ namespace Tests
         [TestMethod]
         public void TestCannotEnableUninstalledExtension()
         {
-            var manager = new ExtensionManager(repository, installationDirectory, systemConfig);
+            var manager = new ExtensionManager(repository, installationDirectory, systemConfig, manifest);
             var extensions = manager.GetExtensions();
             Assert.AreEqual(numberOfExtensions, extensions.Count);
 
